@@ -1,0 +1,163 @@
+/* ============================================================
+   Responsive — layout reorganisation at smaller widths
+   ============================================================ */
+
+/* medium: tighten the chrome, trim labels */
+@media (max-width: 1180px) {
+  .btn--subtle span {
+    display: none;
+  }
+  .menu--file .btn--subtle span {
+    display: inline;
+  }
+  .btn--subtle {
+    padding: 9px 11px;
+  }
+}
+
+@media (max-width: 1400px) {
+  :root {
+    --editor-w: 380px;
+  }
+}
+
+/* narrow: the editor becomes a floating drawer */
+@media (max-width: 900px) {
+  :root[data-layout="bento"] .workspace {
+    display: flex;
+    gap: 2px;
+    padding: 0;
+  }
+
+  .splitter {
+    display: none;
+  }
+
+  .editor-pane {
+    position: fixed;
+    top: calc(var(--gap) + 102px);
+    left: var(--gap);
+    bottom: var(--gap);
+    z-index: 40;
+    width: min(90vw, 460px);
+    max-width: none;
+    flex-basis: auto;
+    margin: 0;
+    transform: translateX(calc(-100% - var(--gap) - 12px));
+    transition: transform 0.4s var(--ease), opacity 0.3s var(--ease);
+    opacity: 1;
+    box-shadow: var(--nm-raised-xl);
+  }
+
+  /* on mobile the "collapsed" attribute must not hide the drawer */
+  .app[data-editor="collapsed"] .editor-pane {
+    flex-basis: auto;
+    width: min(90vw, 460px);
+    margin-right: 0;
+    opacity: 1;
+  }
+
+  .app[data-drawer="open"] .editor-pane {
+    transform: none;
+  }
+
+  .scrim {
+    display: block;
+  }
+  .app[data-drawer="open"] .scrim {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .fab {
+    display: inline-flex;
+  }
+
+  /* the in-toolbar panel toggle and header collapse are redundant here */
+  #panel-toggle {
+    display: none;
+  }
+
+  .global-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+    min-height: 94px;
+    padding: 6px 10px;
+  }
+  .global-toolbar__left {
+    grid-row: 1;
+    justify-content: flex-start;
+  }
+  .global-toolbar__right {
+    grid-row: 2;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .global-toolbar .toolbar__group--center {
+    order: initial;
+    flex-basis: auto;
+    justify-content: flex-start;
+    padding-top: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .global-toolbar__brand {
+    width: 40px;
+    height: 40px;
+  }
+
+  .viewer__hint {
+    display: none;
+  }
+  .pane__foot {
+    padding: 8px 12px 12px;
+  }
+  .pane__meta {
+    display: none;
+  }
+  .global-toolbar__left,
+  .global-toolbar__right,
+  .global-toolbar .toolbar__group--center {
+    gap: 5px;
+  }
+  .global-toolbar__document {
+    flex: 1 1 auto;
+    max-width: none;
+    gap: 8px;
+    margin-left: 5px;
+    padding-left: 9px;
+  }
+  .global-toolbar .toolbar__group--center .btn--subtle span,
+  #export-trigger > span {
+    display: none;
+  }
+  #export-trigger {
+    gap: 5px;
+    padding: 9px 11px;
+  }
+  .toolbar__divider {
+    margin: 0 1px;
+  }
+  .global-toolbar__document-path {
+    max-width: 28vw;
+  }
+}
+
+/* short viewports: reclaim vertical chrome */
+@media (max-height: 620px) {
+  .viewer__hint {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

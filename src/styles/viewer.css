@@ -1,0 +1,183 @@
+/* ============================================================
+   Viewer — a recessed canvas where the diagram floats
+   ============================================================ */
+
+.viewer {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: var(--pad) var(--pad) var(--pad) 12px;
+  margin-top: 12px;
+  border-radius: var(--r-md);
+  background: var(--porcelain-2);
+  box-shadow: var(--nm-pressed);
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+  /* faint ruled texture, like a drafting surface */
+  background-image:
+    radial-gradient(var(--canvas-dot) 1px, transparent 1px);
+  background-size: 22px 22px;
+  background-position: -11px -11px;
+}
+.viewer[data-dragging="true"] {
+  cursor: grabbing;
+}
+
+.global-toolbar__document {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex: 0 1 340px;
+  min-width: 0;
+  max-width: min(340px, 32vw);
+  padding-left: 13px;
+  color: var(--ink-2);
+  border-left: 1px solid rgba(157, 171, 195, 0.32);
+  pointer-events: none;
+}
+.document-status__dot {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 0 3px rgba(110, 155, 120, 0.13);
+}
+.global-toolbar__document[data-state="unsaved"] .document-status__dot {
+  background: var(--clay);
+  box-shadow: 0 0 0 3px rgba(191, 97, 65, 0.14);
+}
+.global-toolbar__document-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.global-toolbar__document-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+.global-toolbar__document-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ink-0);
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.global-toolbar__document-state {
+  flex: 0 0 auto;
+  color: var(--success);
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.global-toolbar__document[data-state="unsaved"] .global-toolbar__document-state {
+  color: var(--clay-lo);
+}
+.global-toolbar__document-path {
+  overflow: hidden;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.global-toolbar__brand {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--porcelain-1) url("../../resources/logo_2.svg") center / 76% no-repeat;
+  box-shadow: var(--nm-raised-sm);
+}
+.global-toolbar__brand svg {
+  display: none;
+}
+
+.viewer__stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+  padding: 0;
+}
+.viewer__stage svg {
+  display: block;
+  max-width: none !important;
+  height: auto;
+  filter: drop-shadow(4px 6px 14px var(--diagram-shadow));
+}
+
+.viewer__loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  font-size: 0.86rem;
+  color: var(--ink-2);
+  border-radius: var(--r-pill);
+  background: var(--porcelain-1);
+  box-shadow: var(--nm-raised-sm);
+  white-space: nowrap;
+}
+.viewer__stage[data-empty="false"] .viewer__loading {
+  display: none;
+}
+
+.viewer__hint {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 15px;
+  font-size: 0.74rem;
+  letter-spacing: 0.01em;
+  color: var(--ink-2);
+  border-radius: var(--r-pill);
+  background: var(--surface-raised);
+  backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--nm-raised-sm);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s var(--ease);
+}
+.viewer:hover .viewer__hint {
+  opacity: 1;
+}
+.viewer__hint .dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--ink-3);
+}
+
+/* mermaid error surface, if the viewer ever renders an invalid diagram */
+.viewer__stage .mermaid-error {
+  padding: 18px 22px;
+  border-radius: var(--r-md);
+  background: var(--porcelain-1);
+  color: var(--danger);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  box-shadow: var(--nm-raised);
+  max-width: 60ch;
+}
+
+/* the dragged/exported diagram should not show the hover shadow */
+.viewer[data-exporting="true"] .viewer__stage svg {
+  filter: none;
+}

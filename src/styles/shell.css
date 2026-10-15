@@ -1,0 +1,320 @@
+/* ============================================================
+   Shell — floating instrument panels on a porcelain field
+   ============================================================ */
+
+.app {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  height: 100dvh;
+  padding: var(--gap);
+  overflow: hidden;
+}
+
+.workspace {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: stretch;
+  flex: 1 1 auto;
+  gap: 2px;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* subtle film grain for tactility */
+.app__grain {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.4;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.pane {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--surface-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-raised-lg);
+}
+
+/* thin highlight on the top edge — makes surfaces feel solid */
+.pane::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: calc(var(--r-lg) - 1px);
+  pointer-events: none;
+  border-top: 1px solid var(--glass-border);
+  border-left: 1px solid var(--glass-border);
+}
+
+/* ---------- editor pane ---------- */
+
+.editor-pane {
+  flex: 0 0 var(--editor-w);
+  width: var(--editor-w);
+  max-width: 62vw;
+  margin: 0 8px 0 var(--pad);
+  transition:
+    width 0.42s var(--ease),
+    flex-basis 0.42s var(--ease),
+    opacity 0.3s var(--ease),
+    margin 0.42s var(--ease);
+}
+
+.app[data-editor="collapsed"] .editor-pane {
+  width: 0;
+  flex-basis: 0;
+  margin-right: calc(var(--splitter-w) * -1 - 2px);
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.pane__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 14px 12px 18px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+.brand__mark {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  border-radius: 12px;
+  color: var(--clay);
+  background: var(--porcelain-1);
+  box-shadow: var(--nm-raised-sm);
+}
+.brand__mark svg {
+  width: 21px;
+  height: 21px;
+  stroke: currentColor;
+}
+
+.brand__name {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-size: 1.16rem;
+  letter-spacing: -0.01em;
+  color: var(--ink-0);
+  white-space: nowrap;
+}
+.brand__name em {
+  font-style: normal;
+  color: var(--clay-lo);
+  font-weight: 500;
+}
+
+/* ---------- splitter ---------- */
+
+.splitter {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 calc(var(--splitter-w) + 4px);
+  width: calc(var(--splitter-w) + 4px);
+  display: grid;
+  place-items: center;
+  cursor: col-resize;
+  background: transparent;
+  transition: flex-basis 0.42s var(--ease), width 0.42s var(--ease), opacity 0.3s;
+}
+.app[data-editor="collapsed"] .splitter {
+  flex-basis: 0;
+  width: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.splitter__grip {
+  width: 6px;
+  height: 44px;
+  border-radius: var(--r-pill);
+  background: var(--porcelain-2);
+  box-shadow: var(--nm-pressed-sm);
+  transition: height 0.2s var(--ease), background 0.2s;
+}
+.splitter:hover .splitter__grip,
+.splitter:focus-visible .splitter__grip,
+.splitter[data-dragging="true"] .splitter__grip {
+  height: 68px;
+  background: var(--clay);
+}
+
+/* ---------- stage pane ---------- */
+
+.stage-pane {
+  flex: 1 1 auto;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* ---------- scrim + fab (mobile) ---------- */
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: var(--modal-backdrop);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.32s var(--ease);
+}
+
+.fab {
+  position: fixed;
+  right: calc(var(--gap) + 4px);
+  bottom: calc(var(--gap) + 4px);
+  z-index: 50;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: linear-gradient(150deg, var(--clay-hi), var(--clay-lo));
+  box-shadow:
+    var(--nm-raised),
+    0 10px 24px rgba(160, 78, 48, 0.35);
+  cursor: pointer;
+  transition: transform 0.2s var(--ease);
+}
+.fab svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+}
+.fab:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* Bento is a layout choice, independent from the visual skin. */
+:root[data-layout="bento"] .workspace {
+  display: grid;
+  grid-template-columns: minmax(0, var(--editor-w)) var(--splitter-w) minmax(0, 1fr);
+  gap: var(--gap);
+  padding: 0 2px;
+}
+:root[data-layout="bento"] .editor-pane {
+  width: auto;
+  max-width: none;
+  margin: 0;
+}
+:root[data-layout="bento"] .stage-pane {
+  min-width: 0;
+}
+:root[data-layout="bento"] .splitter {
+  width: var(--splitter-w);
+  flex-basis: var(--splitter-w);
+}
+:root[data-layout="bento"] .app[data-editor="collapsed"] .workspace {
+  grid-template-columns: 0 0 minmax(0, 1fr);
+}
+:root[data-layout="bento"] .app[data-editor="collapsed"] .editor-pane {
+  margin: 0;
+}
+
+/* Material-specific treatment; layout and component structure stay shared. */
+:root[data-theme^="glass-"] .pane,
+:root[data-theme^="glass-"] .global-toolbar,
+:root[data-theme^="glass-"] .menu__panel,
+:root[data-theme^="glass-"] .preferences-dialog,
+:root[data-theme^="glass-"] .toast,
+:root[data-theme^="glass-"] .viewer__hint {
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur)) saturate(145%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(145%);
+}
+:root[data-theme^="glass-"] .pane::after {
+  opacity: 0.42;
+}
+:root[data-theme^="glass-"] .menu--file .menu__panel {
+  /* Keep the file menu legible over code while preserving glass elsewhere. */
+  background: var(--surface-soft);
+}
+:root[data-theme^="glass-"] .btn:not(.btn--primary),
+:root[data-theme^="glass-"] .icon-btn,
+:root[data-theme^="glass-"] .preferences-dialog__select {
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(calc(var(--glass-blur) * .65));
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) * .65));
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root[data-theme^="glass-"] .pane,
+  :root[data-theme^="glass-"] .global-toolbar,
+  :root[data-theme^="glass-"] .menu__panel,
+  :root[data-theme^="glass-"] .preferences-dialog,
+  :root[data-theme^="glass-"] .toast,
+  :root[data-theme^="glass-"] .viewer__hint,
+  :root[data-theme^="glass-"] .btn:not(.btn--primary),
+  :root[data-theme^="glass-"] .icon-btn,
+  :root[data-theme^="glass-"] .preferences-dialog__select {
+    background: var(--surface-raised);
+  }
+}
+
+:root[data-theme="retro"] .pane,
+:root[data-theme="retro"] .global-toolbar,
+:root[data-theme="retro"] .menu__panel,
+:root[data-theme="retro"] .preferences-dialog,
+:root[data-theme="retro"] .btn,
+:root[data-theme="retro"] .icon-btn,
+:root[data-theme="retro"] .preferences-dialog__select {
+  border: 2px solid var(--text-secondary);
+  box-shadow: 4px 4px 0 var(--shadow-darker);
+}
+:root[data-theme="retro"] .pane::after {
+  display: none;
+}
+:root[data-theme="retro"] .app__grain {
+  opacity: 0.12;
+  mix-blend-mode: multiply;
+}
+
+:root[data-theme="dial-up"] .pane,
+:root[data-theme="dial-up"] .global-toolbar,
+:root[data-theme="dial-up"] .menu__panel,
+:root[data-theme="dial-up"] .preferences-dialog,
+:root[data-theme="dial-up"] .btn,
+:root[data-theme="dial-up"] .icon-btn,
+:root[data-theme="dial-up"] .preferences-dialog__select {
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 0 0 1px rgba(143, 255, 176, 0.08), 5px 5px 0 var(--shadow-darker);
+}
+:root[data-theme="dial-up"] .pane::after {
+  display: none;
+}
+:root[data-theme="dial-up"] .app__grain {
+  opacity: 0.08;
+  mix-blend-mode: screen;
+}

@@ -1,0 +1,103 @@
+/* ============================================================
+   Editor — a recessed well holding CodeMirror
+   ============================================================ */
+
+.editor-well {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 12px var(--pad) var(--pad);
+  border-radius: var(--r-md);
+  background: var(--porcelain-2);
+  box-shadow: var(--nm-pressed);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+}
+
+.editor-host {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* CodeMirror fills the well */
+.editor-host .cm-editor {
+  height: 100%;
+  background: transparent;
+}
+.editor-host .cm-editor.cm-focused {
+  outline: none;
+}
+.editor-host .cm-scroller {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  line-height: 1.75;
+  padding: 14px 4px 14px 10px;
+}
+.editor-host .cm-content {
+  caret-color: var(--clay);
+}
+.editor-host .cm-cursor {
+  border-left-color: var(--clay);
+  border-left-width: 2px;
+}
+.editor-host .cm-gutters {
+  background: transparent;
+  border: 0;
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+}
+.editor-host .cm-activeLineGutter {
+  background: transparent;
+  color: var(--ink-1);
+}
+.editor-host .cm-activeLine {
+  background: var(--active-line);
+  border-radius: 6px;
+}
+.editor-host .cm-selectionBackground,
+.editor-host .cm-content ::selection {
+  background: var(--selection) !important;
+}
+
+/* syntax colours are defined in src/features/editor.ts (highlight style),
+   so they can read the porcelain design tokens. */
+
+/* lint markers */
+.editor-host .cm-lint-marker-error {
+  content: "";
+}
+.editor-host .cm-lintRange-error {
+  background-image: none;
+  text-decoration: underline wavy var(--danger);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+.editor-host .cm-tooltip {
+  z-index: 200;
+  border: 0 !important;
+  border-radius: var(--r-sm) !important;
+  background: var(--porcelain-0) !important;
+  box-shadow: var(--nm-raised-lg) !important;
+  overflow: hidden;
+}
+.editor-host .cm-tooltip-lint {
+  padding: 6px;
+}
+.editor-host .cm-diagnostic {
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  color: var(--ink-1);
+  padding: 7px 10px;
+  border-left: 3px solid var(--danger);
+  border-radius: 6px;
+}
+.editor-host .cm-diagnostic-error {
+  border-left-color: var(--danger);
+}
+.editor-host .cm-panels {
+  background: transparent;
+  color: var(--ink-1);
+}
