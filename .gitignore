@@ -26,4 +26,4 @@ openspec/*
 src-tauri/target/*
 .opencode/*
 .openchamber/*
-landing/*
+landing/
