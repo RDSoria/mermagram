@@ -1,7 +1,7 @@
 import { basicSetup } from "codemirror";
 import { EditorView, keymap } from "@codemirror/view";
 import { Compartment, EditorState, Prec, type Extension } from "@codemirror/state";
-import { indentWithTab } from "@codemirror/commands";
+import { indentWithTab, undo, redo, undoDepth, redoDepth } from "@codemirror/commands";
 import { HighlightStyle, syntaxHighlighting, indentOnInput } from "@codemirror/language";
 import { mermaid, mermaidTags } from "codemirror-lang-mermaid";
 import { linter, lintGutter, forceLinting, type Diagnostic } from "@codemirror/lint";
@@ -58,6 +58,10 @@ export interface EditorHandle {
   focus: () => void;
   replaceDocument: (document: string) => void;
   setVisualTheme: (theme: VisualTheme) => void;
+  undo: () => void;
+  redo: () => void;
+  canUndo: () => boolean;
+  canRedo: () => boolean;
 }
 
 function toDiagnostic(view: EditorView, issue: MermaidIssue): Diagnostic {
@@ -83,6 +87,10 @@ export function createEditor(options: EditorOptions): EditorHandle {
   const themeCompartment = new Compartment();
   const lintSource = async (view: EditorView): Promise<Diagnostic[]> => {
     const code = view.state.doc.toString();
+    if (code.trim().length === 0) {
+      options.onValidated(code, []);
+      return [];
+    }
     const issues = await validateMermaid(code);
     options.onValidated(code, issues);
     return issues.map((issue) => toDiagnostic(view, issue));
@@ -128,5 +136,9 @@ export function createEditor(options: EditorOptions): EditorHandle {
     setVisualTheme: (theme) => {
       view.dispatch({ effects: themeCompartment.reconfigure(editorTheme(theme)) });
     },
+    undo: () => { void undo(view); },
+    redo: () => { void redo(view); },
+    canUndo: () => undoDepth(view.state) > 0,
+    canRedo: () => redoDepth(view.state) > 0,
   };
 }

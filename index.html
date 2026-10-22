@@ -69,6 +69,12 @@
 
       <!-- ============ EDITOR ============ -->
       <aside class="pane editor-pane" id="editor-pane" data-i18n-aria="editor" aria-label="Editor de código Mermaid">
+        <div class="editor-toolbar" role="toolbar" aria-label="Acciones del código">
+          <button class="editor-toolbar__button" id="editor-clear" type="button" aria-label="Borrar código" title="Borrar código">⌫</button>
+          <span class="editor-toolbar__divider" aria-hidden="true"></span>
+          <button class="editor-toolbar__button" id="editor-undo" type="button" aria-label="Deshacer" title="Deshacer" disabled>↶</button>
+          <button class="editor-toolbar__button" id="editor-redo" type="button" aria-label="Rehacer" title="Rehacer" disabled>↷</button>
+        </div>
         <div class="editor-well" id="editor-well">
           <div class="editor-host" id="editor-host"></div>
         </div>
