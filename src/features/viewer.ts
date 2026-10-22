@@ -70,6 +70,19 @@ export class Viewer {
     this.fit();
   }
 
+  clear(): void {
+    this.stage.replaceChildren();
+    this.stage.dataset.empty = "true";
+    this.current = null;
+    this.width = 0;
+    this.height = 0;
+    this.scale = 1;
+    this.tx = 0;
+    this.ty = 0;
+    this.fitMode = true;
+    this.apply();
+  }
+
   hasDiagram(): boolean {
     return this.current !== null;
   }

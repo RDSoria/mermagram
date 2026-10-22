@@ -59,6 +59,7 @@ function boot(): void {
   const errorsList = required<HTMLUListElement>("syntax-errors-list");
   const closeErrors = required<HTMLButtonElement>("syntax-errors-close");
   let focusEditor = (): void => {};
+  let syncEditorHistory = (): void => {};
   let lastIssues: MermaidIssue[] = [];
   let lastCode = store.code;
 
@@ -138,6 +139,16 @@ function boot(): void {
   };
 
   const onValidated = async (code: string, issues: MermaidIssue[]): Promise<void> => {
+    if (code.trim().length === 0) {
+      updateStatus([], code);
+      ++renderToken;
+      viewer.clear();
+      exports.setEnabled(false);
+      latestValidCode = null;
+      lastRenderedCode = null;
+      return;
+    }
+
     updateStatus(issues, code);
     if (issues.length > 0) return;
     latestValidCode = code;
@@ -165,10 +176,32 @@ function boot(): void {
     onDocChanged: (code) => {
       store.setCode(code);
       setPending();
+      syncEditorHistory();
+      if (code.trim().length === 0) {
+        ++renderToken;
+        viewer.clear();
+        exports.setEnabled(false);
+        latestValidCode = null;
+        lastRenderedCode = null;
+      }
     },
     onValidated,
   });
   focusEditor = editor.focus;
+  const clearCode = required<HTMLButtonElement>("editor-clear");
+  const undoCode = required<HTMLButtonElement>("editor-undo");
+  const redoCode = required<HTMLButtonElement>("editor-redo");
+  syncEditorHistory = () => {
+    undoCode.disabled = !editor.canUndo();
+    redoCode.disabled = !editor.canRedo();
+  };
+  clearCode.addEventListener("click", () => {
+    if (store.code.length > 0) editor.replaceDocument("");
+    syncEditorHistory();
+  });
+  undoCode.addEventListener("click", () => { editor.undo(); syncEditorHistory(); });
+  redoCode.addEventListener("click", () => { editor.redo(); syncEditorHistory(); });
+  syncEditorHistory();
 
   store.on("prefs", () => {
     const nextTheme = store.prefs.visualTheme;
