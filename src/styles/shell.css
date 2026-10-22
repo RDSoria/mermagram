@@ -108,11 +108,32 @@
   color: var(--clay);
   background: var(--porcelain-1);
   box-shadow: var(--nm-raised-sm);
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+}
+:root:not([data-theme="neumorphic-dark"]):not([data-theme="glass-dark"]):not([data-theme="dial-up"]) .brand__mark {
+  background-image: url("../../resources/logo_ligth.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+:root[data-theme="neumorphic-dark"] .brand__mark,
+:root[data-theme="glass-dark"] .brand__mark,
+:root[data-theme="dial-up"] .brand__mark {
+  background-image: url("../../resources/logo_dark.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
 }
 .brand__mark svg {
   width: 21px;
   height: 21px;
   stroke: currentColor;
+}
+.brand__mark:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
 }
 
 .brand__name {
@@ -245,6 +266,9 @@
 /* Material-specific treatment; layout and component structure stay shared. */
 :root[data-theme^="glass-"] .pane,
 :root[data-theme^="glass-"] .global-toolbar,
+:root[data-theme^="glass-"] .file-toolbar,
+:root[data-theme^="glass-"] .file-rail,
+:root[data-theme^="glass-"] .file-toolbar::before,
 :root[data-theme^="glass-"] .menu__panel,
 :root[data-theme^="glass-"] .preferences-dialog,
 :root[data-theme^="glass-"] .toast,
@@ -272,6 +296,9 @@
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   :root[data-theme^="glass-"] .pane,
   :root[data-theme^="glass-"] .global-toolbar,
+  :root[data-theme^="glass-"] .file-toolbar,
+  :root[data-theme^="glass-"] .file-rail,
+  :root[data-theme^="glass-"] .file-toolbar::before,
   :root[data-theme^="glass-"] .menu__panel,
   :root[data-theme^="glass-"] .preferences-dialog,
   :root[data-theme^="glass-"] .toast,
@@ -285,6 +312,9 @@
 
 :root[data-theme="retro"] .pane,
 :root[data-theme="retro"] .global-toolbar,
+:root[data-theme="retro"] .file-toolbar,
+:root[data-theme="retro"] .file-rail,
+:root[data-theme="retro"] .file-toolbar::before,
 :root[data-theme="retro"] .menu__panel,
 :root[data-theme="retro"] .preferences-dialog,
 :root[data-theme="retro"] .btn,
@@ -303,6 +333,9 @@
 
 :root[data-theme="dial-up"] .pane,
 :root[data-theme="dial-up"] .global-toolbar,
+:root[data-theme="dial-up"] .file-toolbar,
+:root[data-theme="dial-up"] .file-rail,
+:root[data-theme="dial-up"] .file-toolbar::before,
 :root[data-theme="dial-up"] .menu__panel,
 :root[data-theme="dial-up"] .preferences-dialog,
 :root[data-theme="dial-up"] .btn,
