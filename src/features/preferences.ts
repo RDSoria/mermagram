@@ -66,11 +66,6 @@ export function initPreferences(): void {
   onLanguageChange(populate);
 
   trigger.addEventListener("click", () => {
-    const fileMenu = document.getElementById("file-menu");
-    if (fileMenu) {
-      fileMenu.dataset.open = "false";
-      document.getElementById("file-menu-trigger")?.setAttribute("aria-expanded", "false");
-    }
     populate();
     dialog.showModal();
   });

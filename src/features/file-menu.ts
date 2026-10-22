@@ -1,8 +1,8 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { message } from "@tauri-apps/plugin-dialog";
+import { stat } from "@tauri-apps/plugin-fs";
 import { addRecentFile, fileNameFromPath, loadRecentFiles } from "../core/recent-files";
 import { store } from "../core/store";
-import type { EditorHandle } from "./editor";
 import { showToast } from "./toast";
 import { isDesktop } from "../platform/save";
 import {
@@ -11,94 +11,182 @@ import {
   saveMermaidFile,
   writeMermaidFile,
 } from "../platform/mermaid-files";
-import { onLanguageChange, t } from "../core/i18n";
+import { getLanguage, onLanguageChange, t } from "../core/i18n";
 
 interface FileMenuOptions {
-  menu: HTMLElement;
-  trigger: HTMLButtonElement;
   openButton: HTMLButtonElement;
   saveButton: HTMLButtonElement;
   saveAsButton: HTMLButtonElement;
   recentButton: HTMLButtonElement;
+  recentDialog: HTMLDialogElement;
+  recentCloseButton: HTMLButtonElement;
   recentPanel: HTMLElement;
   status: HTMLElement;
   statusText: HTMLElement;
-  fileName: HTMLElement;
+  fileNameSlot: HTMLElement;
   filePath: HTMLElement;
-  editor: EditorHandle;
-  getCode: () => string;
 }
 
 function errorMessage(error: unknown, fallback: string): string {
   return error instanceof Error && error.message ? error.message : fallback;
 }
 
-export function initFileMenu(options: FileMenuOptions): void {
+function mermaidFileName(name: string): string {
+  const baseName = name.trim() || "diagrama";
+  return /\.(mmd|mermaid)$/i.test(baseName) ? baseName : `${baseName}.mmd`;
+}
+
+export function initFileMenu(options: FileMenuOptions): { saveDocument: (id: string) => Promise<boolean> } {
   const {
-    menu, trigger, openButton, saveButton, saveAsButton, recentButton, recentPanel,
-    status, statusText, fileName, filePath, editor, getCode,
+    openButton, saveButton, saveAsButton, recentButton, recentDialog, recentCloseButton, recentPanel,
+    status, statusText, fileNameSlot, filePath,
   } = options;
   let busy = false;
-  let currentPath: string | null = null;
-  let currentName: string | null = null;
-  let savedCode = getCode();
   let closeInProgress = false;
   let allowClose = false;
+  let editingDocumentId: string | null = null;
+  let recentRenderToken = 0;
+
+  const renderDocumentName = (active = store.activeDocument): void => {
+    if (editingDocumentId === active.id && !active.path) return;
+    fileNameSlot.replaceChildren();
+    const label = active.name || t("unnamedFile");
+    if (active.path) {
+      const name = document.createElement("span");
+      name.className = "global-toolbar__document-name";
+      name.textContent = label;
+      fileNameSlot.append(name);
+      return;
+    }
+
+    const editButton = document.createElement("button");
+    editButton.className = "global-toolbar__document-name document-name-edit";
+    editButton.type = "button";
+    editButton.textContent = label;
+    editButton.setAttribute("aria-label", t("editDocumentName", { name: label }));
+    editButton.title = t("editDocumentNameTitle");
+    editButton.addEventListener("click", () => {
+      if (store.activeDocument.id !== active.id || store.activeDocument.path) return;
+      editingDocumentId = active.id;
+      const input = document.createElement("input");
+      input.className = "global-toolbar__document-name document-name-input";
+      input.type = "text";
+      input.value = active.name;
+      input.maxLength = 160;
+      input.setAttribute("aria-label", t("editDocumentName", { name: label }));
+      input.autocomplete = "off";
+      input.spellcheck = false;
+      fileNameSlot.replaceChildren(input);
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          editingDocumentId = null;
+          renderDocumentName();
+          fileNameSlot.querySelector<HTMLButtonElement>(".document-name-edit")?.focus();
+        } else if (event.key === "Enter") {
+          event.preventDefault();
+          if (store.renameActiveDocument(input.value)) {
+            editingDocumentId = null;
+            updateDocumentStatus();
+            fileNameSlot.querySelector<HTMLButtonElement>(".document-name-edit")?.focus();
+          } else {
+            input.setAttribute("aria-invalid", "true");
+          }
+        }
+      });
+      input.addEventListener("input", () => {
+        input.removeAttribute("aria-invalid");
+        input.removeAttribute("title");
+      });
+      input.focus();
+      input.select();
+    });
+    fileNameSlot.append(editButton);
+  };
 
   const updateDocumentStatus = (): void => {
-    const dirty = getCode() !== savedCode;
+    const active = store.activeDocument;
+    if (editingDocumentId && (editingDocumentId !== active.id || active.path)) editingDocumentId = null;
+    const dirty = active.code !== active.savedCode;
     status.dataset.state = dirty ? "unsaved" : "saved";
     statusText.textContent = dirty ? t("unsaved") : t("saved");
-    fileName.textContent = currentName ?? t("unnamedFile");
-    filePath.textContent = currentPath ?? (currentName === null ? t("newDocument") : t("locationUnavailable"));
-    status.title = currentPath ? `${currentName}\n${currentPath}` : fileName.textContent;
+    renderDocumentName(active);
+    filePath.textContent = active.path ?? t("newDocument");
+    filePath.hidden = !active.path;
+    status.title = active.path ? `${active.name}\n${active.path}` : active.name;
   };
   updateDocumentStatus();
   store.on("code", updateDocumentStatus);
-
-  const markSaved = (code: string, path: string | null, name?: string): void => {
-    savedCode = code;
-    currentPath = path;
-    currentName = path ? fileNameFromPath(path) : name ?? null;
-    updateDocumentStatus();
-  };
+  store.on("documents", updateDocumentStatus);
 
   const setRecentOpen = (open: boolean): void => {
-    recentPanel.hidden = !open;
+    if (open && !recentDialog.open) recentDialog.showModal();
+    if (!open && recentDialog.open) recentDialog.close();
     recentButton.setAttribute("aria-expanded", String(open));
   };
 
-  const setMenuOpen = (open: boolean): void => {
-    menu.dataset.open = String(open);
-    trigger.setAttribute("aria-expanded", String(open));
-    if (!open) setRecentOpen(false);
-    else renderRecentFiles();
-  };
-
   const renderRecentFiles = (): void => {
+    const renderToken = ++recentRenderToken;
     recentPanel.replaceChildren();
     const files = isDesktop() ? loadRecentFiles() : [];
     if (files.length === 0) {
       const empty = document.createElement("span");
-      empty.className = "menu__empty";
+      empty.className = "recent-files__empty";
       empty.textContent = t("noRecent");
       recentPanel.append(empty);
       return;
     }
-    for (const file of files) {
-      const item = document.createElement("button");
-      item.className = "menu__recent-item";
-      item.type = "button";
-      item.role = "menuitem";
-      item.textContent = fileNameFromPath(file.path);
-      item.title = file.path;
-      item.setAttribute("aria-label", t("openFileLabel", { name: fileNameFromPath(file.path) }));
-      item.addEventListener("click", () => {
-        setMenuOpen(false);
-        void openRecent(file.path);
+    void Promise.all(files.map(async (file, index) => {
+      let modifiedAt: Date | null = null;
+      try {
+        const details = await stat(file.path);
+        if (details.mtime instanceof Date && Number.isFinite(details.mtime.getTime())) {
+          modifiedAt = details.mtime;
+        }
+      } catch {
+        // Keep inaccessible or removed files in the recent list without a date.
+      }
+      return { file, index, modifiedAt };
+    })).then((entries) => {
+      if (renderToken !== recentRenderToken) return;
+      entries.sort((a, b) => {
+        if (a.modifiedAt && b.modifiedAt) return b.modifiedAt.getTime() - a.modifiedAt.getTime() || a.index - b.index;
+        if (a.modifiedAt) return -1;
+        if (b.modifiedAt) return 1;
+        return a.index - b.index;
       });
-      recentPanel.append(item);
-    }
+      recentPanel.replaceChildren(...entries.map(({ file, modifiedAt }) => {
+        const row = document.createElement("div");
+        row.className = "recent-files__item";
+        row.role = "listitem";
+        const item = document.createElement("button");
+        item.className = "menu__recent-item";
+        item.type = "button";
+        const name = document.createElement("span");
+        name.className = "recent-file__name";
+        name.textContent = fileNameFromPath(file.path);
+        const path = document.createElement("span");
+        path.className = "recent-file__path";
+        path.textContent = file.path;
+        item.append(name, path);
+        if (modifiedAt) {
+          const date = document.createElement("span");
+          date.className = "recent-file__date";
+          date.textContent = t("lastEdited", {
+            date: new Intl.DateTimeFormat(getLanguage(), { dateStyle: "medium", timeStyle: "short" }).format(modifiedAt),
+          });
+          item.append(date);
+        }
+        item.title = file.path;
+        item.setAttribute("aria-label", t("openFileLabel", { name: fileNameFromPath(file.path) }));
+        item.addEventListener("click", () => {
+          setRecentOpen(false);
+          void openRecent(file.path);
+        });
+        row.append(item);
+        return row;
+      }));
+    });
   };
 
   onLanguageChange(() => {
@@ -112,29 +200,33 @@ export function initFileMenu(options: FileMenuOptions): void {
     saveButton.disabled = value;
     saveAsButton.disabled = value;
     recentButton.disabled = value;
+    recentCloseButton.disabled = value;
     recentPanel.querySelectorAll<HTMLButtonElement>("button").forEach((item) => {
       item.disabled = value;
     });
   };
 
   const saveAs = async (): Promise<boolean> => {
-    const code = getCode();
-    const result = await saveMermaidFile(code, currentPath ? fileNameFromPath(currentPath) : "diagrama.mmd");
+    const code = store.code;
+    const active = store.activeDocument;
+    const defaultName = active.path ? fileNameFromPath(active.path) : mermaidFileName(active.name);
+    const result = await saveMermaidFile(code, defaultName);
     if (result.status === "cancelled") return false;
     const path = isDesktop() ? result.path : null;
     if (path) addRecentFile(path);
-    markSaved(code, path, fileNameFromPath(result.path));
+    store.markActiveDocumentSaved(code, path, fileNameFromPath(result.path));
     showToast(t("savedDiagram"), "success");
     return true;
   };
 
   const saveCurrent = async (): Promise<boolean> => {
-    const code = getCode();
-    if (!currentPath) return saveAs();
-    await writeMermaidFile(currentPath, code);
-    addRecentFile(currentPath);
-    markSaved(code, currentPath);
-    showToast(t("savedChanges", { name: fileNameFromPath(currentPath) }), "success");
+    const code = store.code;
+    const active = store.activeDocument;
+    if (!active.path) return saveAs();
+    await writeMermaidFile(active.path, code);
+    addRecentFile(active.path);
+    store.markActiveDocumentSaved(code, active.path, active.name);
+    showToast(t("savedChanges", { name: fileNameFromPath(active.path) }), "success");
     return true;
   };
 
@@ -143,9 +235,10 @@ export function initFileMenu(options: FileMenuOptions): void {
     setBusy(true);
     try {
       const content = await readMermaidFile(path);
-      editor.replaceDocument(content);
+      const existing = store.documents.find((item) => item.path === path);
+      if (existing) store.activateDocument(existing.id);
+      else store.createDocument(content, path, fileNameFromPath(path), true);
       addRecentFile(path);
-      markSaved(content, path, fileNameFromPath(path));
       showToast(t("openedDiagram", { name: fileNameFromPath(path) }), "success");
     } catch (error) {
       showToast(errorMessage(error, t("openRecentError")), "error");
@@ -157,14 +250,15 @@ export function initFileMenu(options: FileMenuOptions): void {
 
   const openFile = async (): Promise<void> => {
     if (busy) return;
-    setMenuOpen(false);
+    setRecentOpen(false);
     setBusy(true);
     try {
       const result = await openMermaidFile();
       if (result.status === "cancelled") return;
-      editor.replaceDocument(result.content);
+      const existing = result.path ? store.documents.find((item) => item.path === result.path) : undefined;
+      if (existing) store.activateDocument(existing.id);
+      else store.createDocument(result.content, result.path, result.name, true);
       if (result.path) addRecentFile(result.path);
-      markSaved(result.content, result.path, result.name);
       showToast(t("openedDiagram", { name: result.name }), "success");
     } catch (error) {
       showToast(errorMessage(error, t("openDiagramError")), "error");
@@ -173,9 +267,9 @@ export function initFileMenu(options: FileMenuOptions): void {
     }
   };
 
-  const saveFromMenu = async (save: () => Promise<boolean>): Promise<void> => {
+  const saveFromToolbar = async (save: () => Promise<boolean>): Promise<void> => {
     if (busy) return;
-    setMenuOpen(false);
+    setRecentOpen(false);
     setBusy(true);
     try {
       await save();
@@ -186,29 +280,35 @@ export function initFileMenu(options: FileMenuOptions): void {
     }
   };
 
-  trigger.addEventListener("click", (event) => {
-    event.stopPropagation();
-    if (busy) return;
-    setMenuOpen(menu.dataset.open !== "true");
-  });
+  const saveDocument = async (id: string): Promise<boolean> => {
+    if (busy) return false;
+    const previousId = store.activeDocument.id;
+    setBusy(true);
+    try {
+      store.activateDocument(id);
+      return await saveCurrent();
+    } catch (error) {
+      showToast(errorMessage(error, t("saveDiagramError")), "error");
+      return false;
+    } finally {
+      if (store.documents.some((document) => document.id === previousId)) store.activateDocument(previousId);
+      setBusy(false);
+    }
+  };
+
   openButton.addEventListener("click", () => void openFile());
-  saveButton.addEventListener("click", () => void saveFromMenu(saveCurrent));
-  saveAsButton.addEventListener("click", () => void saveFromMenu(saveAs));
+  saveButton.addEventListener("click", () => void saveFromToolbar(saveCurrent));
+  saveAsButton.addEventListener("click", () => void saveFromToolbar(saveAs));
   recentButton.addEventListener("click", () => {
     if (busy) return;
     renderRecentFiles();
-    setRecentOpen(recentPanel.hidden === true);
+    setRecentOpen(!recentDialog.open);
   });
-
-  window.addEventListener("pointerdown", (event) => {
-    if (menu.dataset.open === "true" && !menu.contains(event.target as Node)) setMenuOpen(false);
+  recentCloseButton.addEventListener("click", () => setRecentOpen(false));
+  recentDialog.addEventListener("click", (event) => {
+    if (event.target === recentDialog) setRecentOpen(false);
   });
-  window.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && menu.dataset.open === "true") {
-      setMenuOpen(false);
-      trigger.focus();
-    }
-  });
+  recentDialog.addEventListener("close", () => recentButton.setAttribute("aria-expanded", "false"));
 
   if (isDesktop()) {
     const appWindow = getCurrentWindow();
@@ -216,7 +316,7 @@ export function initFileMenu(options: FileMenuOptions): void {
       if (allowClose) return;
       event.preventDefault();
       if (closeInProgress) return;
-      if (getCode() === savedCode) {
+      if (!store.documents.some((document) => document.savedCode === null || document.code !== document.savedCode)) {
         allowClose = true;
         await appWindow.destroy();
         return;
@@ -234,8 +334,17 @@ export function initFileMenu(options: FileMenuOptions): void {
         });
         if (choice === cancelLabel || choice === "Cancel") return;
         if (choice === saveLabel || choice === "Yes") {
-          const saved = await saveCurrent();
-          if (!saved) return;
+          const activeId = store.activeDocument.id;
+          for (const document of store.documents) {
+            if (document.savedCode !== null && document.code === document.savedCode) continue;
+            store.activateDocument(document.id);
+            const saved = await saveCurrent();
+            if (!saved) {
+              store.activateDocument(activeId);
+              return;
+            }
+          }
+          store.activateDocument(activeId);
         } else if (choice !== noSaveLabel && choice !== "No") return;
         allowClose = true;
         await appWindow.destroy();
@@ -247,10 +356,12 @@ export function initFileMenu(options: FileMenuOptions): void {
     });
   } else {
     window.addEventListener("beforeunload", (event) => {
-      if (getCode() !== savedCode) {
+      if (store.documents.some((document) => document.savedCode === null || document.code !== document.savedCode)) {
         event.preventDefault();
         event.returnValue = "";
       }
     });
   }
+
+  return { saveDocument };
 }
