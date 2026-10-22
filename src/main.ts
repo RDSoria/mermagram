@@ -101,6 +101,15 @@ function boot(): void {
   initLayout();
   initPreferences();
 
+  const aboutTrigger = required<HTMLButtonElement>("about-trigger");
+  const aboutDialog = required<HTMLDialogElement>("about-dialog");
+  required("app-version").textContent = __APP_VERSION__;
+  aboutTrigger.addEventListener("click", () => aboutDialog.showModal());
+  required<HTMLButtonElement>("about-close").addEventListener("click", () => aboutDialog.close());
+  aboutDialog.addEventListener("click", (event) => {
+    if (event.target === aboutDialog) aboutDialog.close();
+  });
+
   let renderToken = 0;
   let activeTheme = store.prefs.visualTheme;
   let latestValidCode: string | null = null;
@@ -187,6 +196,79 @@ function boot(): void {
     },
     onValidated,
   });
+  const tabs = required("document-tabs");
+  let saveDocument = async (_id: string): Promise<boolean> => false;
+  const closeDialog = required<HTMLDialogElement>("close-tab-dialog");
+  closeDialog.querySelectorAll<HTMLButtonElement>("[data-close-choice]").forEach((button) => {
+    button.addEventListener("click", () => closeDialog.close(button.dataset.closeChoice));
+  });
+  const askCloseChoice = (): Promise<string> => new Promise((resolve) => {
+    closeDialog.addEventListener("close", () => resolve(closeDialog.returnValue), { once: true });
+    closeDialog.showModal();
+  });
+  const closeDocumentTab = async (id: string): Promise<void> => {
+    const target = store.documents.find((document) => document.id === id);
+    if (!target) return;
+    if (target.savedCode === null || target.code !== target.savedCode) {
+      const choice = await askCloseChoice();
+      if (choice === "cancel" || choice === "") return;
+      if (choice === "save" && !(await saveDocument(id))) return;
+    }
+    store.removeDocument(id);
+  };
+  required<HTMLButtonElement>("new-document").addEventListener("click", () => {
+    const name = `${t("unnamedFile")} ${store.documents.length + 1}`;
+    store.createDocument("", null, name);
+  });
+  const renderTabs = (): void => {
+    tabs.replaceChildren(...store.documents.map((doc) => {
+      const shell = window.document.createElement("div");
+      shell.className = "document-tab-shell";
+      shell.setAttribute("role", "presentation");
+      const tab = window.document.createElement("button");
+      tab.className = "document-tab";
+      tab.type = "button";
+      tab.role = "tab";
+      tab.setAttribute("aria-selected", String(doc.id === store.activeDocument.id));
+      tab.title = doc.path ?? doc.name;
+      const copy = window.document.createElement("span");
+      copy.className = "document-tab__copy";
+      const label = window.document.createElement("span");
+      label.className = "document-tab__name";
+      label.textContent = doc.name || t("unnamedFile");
+      copy.append(label);
+      const marker = window.document.createElement("span");
+      marker.className = "document-tab__status";
+      marker.dataset.state = doc.savedCode !== null && doc.code === doc.savedCode ? "saved" : "unsaved";
+      marker.setAttribute("aria-label", doc.savedCode !== null && doc.code === doc.savedCode ? t("saved") : t("unsaved"));
+      marker.title = doc.savedCode !== null && doc.code === doc.savedCode ? t("saved") : t("unsaved");
+      const close = window.document.createElement("button");
+      close.className = "document-tab__close";
+      close.type = "button";
+      close.setAttribute("aria-label", `${t("closeTab")}: ${doc.name || t("unnamedFile")}`);
+      close.title = t("closeTab");
+      close.textContent = "×";
+      close.addEventListener("click", (event) => {
+        event.stopPropagation();
+        void closeDocumentTab(doc.id);
+      });
+      tab.append(copy, marker);
+      shell.append(tab, close);
+      tab.addEventListener("click", () => {
+        store.activateDocument(doc.id);
+        editor.replaceDocument(doc.code);
+        syncEditorHistory();
+      });
+      return shell;
+    }));
+  };
+  renderTabs();
+  store.on("documents", renderTabs);
+  store.on("code", () => {
+    if (editor.view.state.doc.toString() !== store.code) editor.replaceDocument(store.code);
+    renderTabs();
+  });
+  onLanguageChange(renderTabs);
   focusEditor = editor.focus;
   const clearCode = required<HTMLButtonElement>("editor-clear");
   const undoCode = required<HTMLButtonElement>("editor-undo");
@@ -225,21 +307,20 @@ function boot(): void {
     });
   });
 
-  initFileMenu({
-    menu: required("file-menu"),
-    trigger: required<HTMLButtonElement>("file-menu-trigger"),
+  const fileMenu = initFileMenu({
     openButton: required<HTMLButtonElement>("open-file"),
     saveButton: required<HTMLButtonElement>("save-file"),
     saveAsButton: required<HTMLButtonElement>("save-as-file"),
     recentButton: required<HTMLButtonElement>("recent-files-trigger"),
+    recentDialog: required<HTMLDialogElement>("recent-files-dialog"),
+    recentCloseButton: required<HTMLButtonElement>("recent-files-close"),
     recentPanel: required("recent-files-panel"),
     status: required("document-status"),
     statusText: required("document-status-text"),
-    fileName: required("document-name"),
+    fileNameSlot: required("document-name-slot"),
     filePath: required("document-path"),
-    editor,
-    getCode: () => store.code,
   });
+  saveDocument = fileMenu.saveDocument;
 
   /* ---------------- viewer toolbar ---------------- */
 

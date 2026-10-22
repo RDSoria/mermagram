@@ -68,15 +68,19 @@ const es = {
   syntaxLine: "Línea {line}: {message}",
   syntaxErrorsTitle: "Detalles de errores de sintaxis",
   closeSyntaxErrors: "Cerrar detalles de errores",
+  closeTab: "Cerrar pestaña",
   syntaxErrorAtLine: "Línea {line}:",
   syntaxError: "Error de renderizado del diagrama.",
   editorMeta: "{lines} líneas · {characters} car.",
   unnamedFile: "Archivo sin nombre",
+  editDocumentName: "Editar nombre del documento: {name}",
+  editDocumentNameTitle: "Haz clic para cambiar el nombre de este documento sin guardar",
   unsaved: "Cambios sin guardar",
   saved: "Guardado",
   newDocument: "Documento nuevo",
   locationUnavailable: "Ubicación no disponible",
   openFileLabel: "Abrir {name}",
+  lastEdited: "Última edición · {date}",
   savedDiagram: "Diagrama Mermaid guardado.",
   savedChanges: "Cambios guardados · {name}",
   openedDiagram: "Diagrama abierto · {name}",
@@ -128,32 +132,38 @@ const translations: Record<Language, Catalog> = {
 Object.assign(translations.en, {
   appearance: "Appearance", appearanceDescription: "Choose the app's visual skin.", layoutPreference: "Layout", layoutDescription: "Choose how the editor and viewer are arranged.",
   themeNeumorphicLight: "Light neumorphism", themeNeumorphicDark: "Dark neumorphism", themeGlassLight: "Light glassmorphism", themeGlassDark: "Dark glassmorphism", themeRetro: "Retro", themeDialUp: "Dial-up · BBS", layoutClassic: "Classic", layoutBento: "Bento Grid",
-  syntaxErrorsTitle: "Syntax error details", closeSyntaxErrors: "Close error details", syntaxErrorAtLine: "Line {line}:",
+  syntaxErrorsTitle: "Syntax error details", closeSyntaxErrors: "Close error details", closeTab: "Close tab", syntaxErrorAtLine: "Line {line}:",
+  editDocumentName: "Edit document name: {name}", editDocumentNameTitle: "Click to rename this unsaved document", lastEdited: "Last edited · {date}",
 });
 Object.assign(translations.fr, {
   appearance: "Apparence", appearanceDescription: "Choisissez le style visuel de l’application.", layoutPreference: "Disposition", layoutDescription: "Choisissez l’organisation de l’éditeur et de l’aperçu.",
   themeNeumorphicLight: "Néomorphisme clair", themeNeumorphicDark: "Néomorphisme sombre", themeGlassLight: "Glassmorphisme clair", themeGlassDark: "Glassmorphisme sombre", themeRetro: "Rétro", themeDialUp: "Dial-up · BBS", layoutClassic: "Classique", layoutBento: "Bento Grid",
-  syntaxErrorsTitle: "Détails des erreurs de syntaxe", closeSyntaxErrors: "Fermer les détails des erreurs", syntaxErrorAtLine: "Ligne {line} :",
+  syntaxErrorsTitle: "Détails des erreurs de syntaxe", closeSyntaxErrors: "Fermer les détails des erreurs", closeTab: "Fermer l’onglet", syntaxErrorAtLine: "Ligne {line} :",
+  editDocumentName: "Modifier le nom du document : {name}", editDocumentNameTitle: "Cliquez pour renommer ce document non enregistré", lastEdited: "Dernière modification · {date}",
 });
 Object.assign(translations.it, {
   appearance: "Aspetto", appearanceDescription: "Scegli lo stile visivo dell’app.", layoutPreference: "Disposizione", layoutDescription: "Scegli come organizzare editor e visualizzatore.",
   themeNeumorphicLight: "Neumorfismo chiaro", themeNeumorphicDark: "Neumorfismo scuro", themeGlassLight: "Glassmorfismo chiaro", themeGlassDark: "Glassmorfismo scuro", themeRetro: "Retrò", themeDialUp: "Dial-up · BBS", layoutClassic: "Classica", layoutBento: "Bento Grid",
-  syntaxErrorsTitle: "Dettagli degli errori di sintassi", closeSyntaxErrors: "Chiudi i dettagli degli errori", syntaxErrorAtLine: "Riga {line}:",
+  syntaxErrorsTitle: "Dettagli degli errori di sintassi", closeSyntaxErrors: "Chiudi i dettagli degli errori", closeTab: "Chiudi scheda", syntaxErrorAtLine: "Riga {line}:",
+  editDocumentName: "Modifica nome documento: {name}", editDocumentNameTitle: "Fai clic per rinominare questo documento non salvato", lastEdited: "Ultima modifica · {date}",
 });
 Object.assign(translations.ca, {
   appearance: "Aparença", appearanceDescription: "Tria l’estil visual de l’aplicació.", layoutPreference: "Distribució", layoutDescription: "Tria com s’organitzen l’editor i el visor.",
   themeNeumorphicLight: "Neomorfisme clar", themeNeumorphicDark: "Neomorfisme fosc", themeGlassLight: "Glassmorfisme clar", themeGlassDark: "Glassmorfisme fosc", themeRetro: "Retro", themeDialUp: "Dial-up · BBS", layoutClassic: "Clàssica", layoutBento: "Bento Grid",
-  syntaxErrorsTitle: "Detalls dels errors de sintaxi", closeSyntaxErrors: "Tanca els detalls dels errors", syntaxErrorAtLine: "Línia {line}:",
+  syntaxErrorsTitle: "Detalls dels errors de sintaxi", closeSyntaxErrors: "Tanca els detalls dels errors", closeTab: "Tanca la pestanya", syntaxErrorAtLine: "Línia {line}:",
+  editDocumentName: "Edita el nom del document: {name}", editDocumentNameTitle: "Fes clic per canviar el nom d’aquest document sense desar", lastEdited: "Última edició · {date}",
 });
 Object.assign(translations.de, {
   appearance: "Erscheinungsbild", appearanceDescription: "Wählen Sie den visuellen Stil der App.", layoutPreference: "Anordnung", layoutDescription: "Wählen Sie die Anordnung von Editor und Vorschau.",
   themeNeumorphicLight: "Heller Neumorphismus", themeNeumorphicDark: "Dunkler Neumorphismus", themeGlassLight: "Heller Glassmorphismus", themeGlassDark: "Dunkler Glassmorphismus", themeRetro: "Retro", themeDialUp: "Dial-up · BBS", layoutClassic: "Klassisch", layoutBento: "Bento Grid",
-  syntaxErrorsTitle: "Details zu Syntaxfehlern", closeSyntaxErrors: "Fehlerdetails schließen", syntaxErrorAtLine: "Zeile {line}:",
+  syntaxErrorsTitle: "Details zu Syntaxfehlern", closeSyntaxErrors: "Fehlerdetails schließen", closeTab: "Tab schließen", syntaxErrorAtLine: "Zeile {line}:",
+  editDocumentName: "Dokumentnamen bearbeiten: {name}", editDocumentNameTitle: "Klicken, um dieses ungespeicherte Dokument umzubenennen", lastEdited: "Zuletzt geändert · {date}",
 });
 Object.assign(translations["zh-CN"], {
   appearance: "外观", appearanceDescription: "选择应用的视觉风格。", layoutPreference: "布局", layoutDescription: "选择编辑器和预览区的排列方式。",
   themeNeumorphicLight: "浅色新拟态", themeNeumorphicDark: "深色新拟态", themeGlassLight: "浅色玻璃拟态", themeGlassDark: "深色玻璃拟态", themeRetro: "复古", themeDialUp: "拨号上网 · BBS", layoutClassic: "经典", layoutBento: "Bento 网格",
-  syntaxErrorsTitle: "语法错误详情", closeSyntaxErrors: "关闭错误详情", syntaxErrorAtLine: "第 {line} 行：",
+  syntaxErrorsTitle: "语法错误详情", closeSyntaxErrors: "关闭错误详情", closeTab: "关闭标签页", syntaxErrorAtLine: "第 {line} 行：",
+  editDocumentName: "编辑文档名称：{name}", editDocumentNameTitle: "点击以重命名此未保存的文档", lastEdited: "最后修改 · {date}",
 });
 
 translations.en.zoomOutTitle = "Zoom out (⌘−)";
