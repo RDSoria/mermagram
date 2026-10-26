@@ -1,6 +1,6 @@
 [package]
 name = "mermagram"
-version = "0.1.0"
+version = "2.0.0"
 description = "Visor y editor de diagramas Mermaid con estilo neumorfismo"
 authors = ["you"]
 edition = "2024"
