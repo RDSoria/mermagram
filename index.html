@@ -11,7 +11,7 @@
     <div class="app" id="app" data-editor="expanded" data-drawer="closed">
       <div class="app__grain" aria-hidden="true"></div>
 
-      <section class="file-toolbar" aria-label="Archivo activo">
+      <section class="file-toolbar" id="file-toolbar" aria-label="Archivo activo">
         <nav class="file-rail" role="toolbar" data-i18n-aria="toolbar" aria-label="Herramientas de Mermagram">
           <button class="brand__mark global-toolbar__brand file-rail__brand" id="about-trigger" type="button" aria-label="Acerca de Mermagram" title="Acerca de Mermagram" aria-haspopup="dialog" aria-controls="about-dialog"></button>
           <button class="icon-btn icon-btn--ghost file-rail__button" id="open-file" type="button" data-i18n-aria="open" data-i18n-title="open" aria-label="Abrir" title="Abrir">
@@ -23,8 +23,12 @@
           <button class="icon-btn icon-btn--ghost file-rail__button" id="preferences-trigger" type="button" data-i18n-aria="preferences" data-i18n-title="preferences" aria-label="Preferencias" title="Preferencias">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.2 2.8h3.6l.55 2.15a7.5 7.5 0 0 1 1.55.9l2.1-.7 1.8 3.1-1.55 1.55a7.6 7.6 0 0 1 0 1.8l1.55 1.55-1.8 3.1-2.1-.7a7.5 7.5 0 0 1-1.55.9l-.55 2.15h-3.6l-.55-2.15a7.5 7.5 0 0 1-1.55-.9l-2.1.7-1.8-3.1 1.55-1.55a7.6 7.6 0 0 1 0-1.8L4.2 8.25 6 5.15l2.1.7a7.5 7.5 0 0 1 1.55-.9l.55-2.15Z"/><circle cx="12" cy="11.7" r="3"/></svg>
           </button>
+          <button class="mcp-indicator" id="mcp-toggle" type="button" aria-label="MCP detenido" title="Activar servidor MCP" aria-pressed="false">
+            <span class="mcp-indicator__dot" aria-hidden="true"></span><span>MCP</span>
+          </button>
         </nav>
         <div class="document-tabs" id="document-tabs" role="tablist" aria-label="Archivos abiertos"></div>
+        <button class="icon-btn icon-btn--ghost workspace-picker-trigger" id="workspace-picker-trigger" type="button" aria-label="Workspaces" title="Workspaces" aria-haspopup="dialog" aria-controls="workspace-picker-dialog">▦</button>
         <button class="icon-btn icon-btn--ghost file-toolbar__new" id="new-document" type="button" aria-label="Nuevo documento" title="Nuevo documento">＋</button>
         <button class="icon-btn icon-btn--ghost" id="panel-toggle" type="button" data-i18n-aria="toggleEditor" data-i18n-title="toggleEditorTitle" aria-label="Mostrar u ocultar el editor" title="Mostrar / ocultar editor (⌘B)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3" /><path d="M9.5 4v16" /></svg>
@@ -72,6 +76,8 @@
       <!-- ============ EDITOR ============ -->
       <aside class="pane editor-pane" id="editor-pane" data-i18n-aria="editor" aria-label="Editor de código Mermaid">
         <div class="editor-toolbar" role="toolbar" aria-label="Acciones del código">
+          <button class="editor-toolbar__button workspace-protect-button" id="workspace-protect" type="button" aria-label="Proteger documento frente a agentes" title="Proteger documento frente a agentes" hidden>⌑</button>
+          <span class="editor-toolbar__divider workspace-protect-divider" id="workspace-protect-divider" aria-hidden="true" hidden></span>
           <button class="editor-toolbar__button" id="editor-clear" type="button" aria-label="Borrar código" title="Borrar código">⌫</button>
           <span class="editor-toolbar__divider" aria-hidden="true"></span>
           <button class="editor-toolbar__button" id="editor-undo" type="button" aria-label="Deshacer" title="Deshacer" disabled>↶</button>
@@ -167,6 +173,54 @@
             <label class="preferences-dialog__label" id="language-label" for="language-select" data-i18n="language">Idioma</label>
             <select id="language-select" class="preferences-dialog__select"></select>
           </section>
+          <section class="preferences-dialog__section mcp-settings" aria-labelledby="mcp-settings-title">
+            <h3 class="preferences-dialog__label" id="mcp-settings-title" data-i18n="mcpTitle">Servidor MCP local</h3>
+            <p class="preferences-dialog__description" id="mcp-settings-status" aria-live="polite" data-i18n="mcpStopped">Detenido · disponible solo mientras Mermagram esté abierta.</p>
+            <p class="preferences-dialog__description" id="mcp-connection-status" aria-live="polite" data-i18n="mcpNoClients">No hay agentes conectados.</p>
+            <ul class="mcp-connection-list" id="mcp-connection-list" aria-live="polite"></ul>
+            <p class="preferences-dialog__description" id="mcp-pending-status" aria-live="polite"></p>
+            <p class="mcp-error" id="mcp-error-status" role="alert" hidden></p>
+            <label class="preferences-dialog__label" for="mcp-port" data-i18n="mcpPort">Puerto</label>
+            <div class="mcp-settings__row">
+              <input class="preferences-dialog__select" id="mcp-port" type="number" min="1" max="65535" inputmode="numeric" value="38641">
+              <button class="btn btn--subtle" id="mcp-save-port" type="button" data-i18n="mcpApplyPort">Aplicar</button>
+              <button class="btn btn--subtle" id="mcp-auto-port" type="button" data-i18n="mcpAutoPort">Elegir disponible</button>
+            </div>
+            <label class="preferences-dialog__label" for="mcp-endpoint" data-i18n="mcpEndpoint">Endpoint para el agente</label>
+            <div class="mcp-settings__row">
+              <input class="preferences-dialog__select mcp-settings__endpoint" id="mcp-endpoint" type="text" readonly value="http://127.0.0.1:38641/mcp">
+              <button class="btn btn--subtle" id="mcp-copy-endpoint" type="button" data-i18n="mcpCopy">Copiar</button>
+            </div>
+            <p class="preferences-dialog__description" data-i18n="mcpSetupHint">Registra este endpoint en la configuración MCP de tu agente. No hay descubrimiento automático.</p>
+          </section>
+        </form>
+      </dialog>
+      <dialog class="preferences-dialog mcp-approval-dialog" id="mcp-approval-dialog" aria-labelledby="mcp-approval-title">
+        <header class="preferences-dialog__header"><h2 id="mcp-approval-title" data-i18n="mcpApprovalTitle">Solicitud de acceso MCP</h2></header>
+        <p id="mcp-approval-copy"></p>
+        <dl class="mcp-approval-dialog__details"><dt data-i18n="mcpAgent">Agente</dt><dd id="mcp-approval-agent"></dd><dt data-i18n="mcpWorkspace">Workspace</dt><dd id="mcp-approval-workspace"></dd><dt data-i18n="mcpDescription">Descripción</dt><dd id="mcp-approval-description"></dd><dt data-i18n="mcpScope">Permisos</dt><dd id="mcp-approval-scope" data-i18n="mcpReadWriteScope">Lectura y escritura de documentos en este workspace</dd></dl>
+        <div class="close-tab-dialog__actions">
+          <button class="btn btn--subtle" id="mcp-approval-reject" type="button" data-i18n="mcpReject">Rechazar</button>
+          <button class="btn btn--primary" id="mcp-approval-approve" type="button" data-i18n="mcpApprove">Aprobar acceso</button>
+        </div>
+      </dialog>
+      <dialog class="preferences-dialog workspace-picker-dialog" id="workspace-picker-dialog" aria-labelledby="workspace-picker-title">
+        <header class="preferences-dialog__header"><h2 id="workspace-picker-title" data-i18n="workspacePickerTitle">Workspaces</h2><button class="icon-btn icon-btn--ghost" id="workspace-picker-close" type="button" data-i18n-aria="preferencesClose" aria-label="Cerrar">×</button></header>
+        <div class="workspace-picker-list" id="workspace-picker-list" role="list"></div>
+      </dialog>
+      <dialog class="preferences-dialog workspace-picker-dialog" id="workspace-documents-dialog" aria-labelledby="workspace-documents-title">
+        <header class="preferences-dialog__header"><h2 id="workspace-documents-title" data-i18n="workspaceDocumentsTitle">Documentos del workspace</h2><button class="icon-btn icon-btn--ghost" id="workspace-documents-close" type="button" data-i18n-aria="preferencesClose" aria-label="Cerrar">×</button></header>
+        <div class="workspace-picker-list" id="workspace-documents-list" role="list"></div>
+      </dialog>
+      <dialog class="preferences-dialog workspace-save-as-dialog" id="workspace-save-as-dialog" aria-labelledby="workspace-save-as-title">
+        <form class="preferences-dialog__form" id="workspace-save-as-form">
+          <header class="preferences-dialog__header"><h2 id="workspace-save-as-title" data-i18n="workspaceSaveAsTitle">Guardar como</h2><button class="icon-btn icon-btn--ghost" id="workspace-save-as-close" type="button" data-i18n-aria="preferencesClose" aria-label="Cerrar">×</button></header>
+          <label class="workspace-save-as-dialog__label" for="workspace-save-as-name" data-i18n="workspaceDocumentName">Nombre del documento</label>
+          <input class="workspace-save-as-dialog__input" id="workspace-save-as-name" type="text" maxlength="160" required autocomplete="off">
+          <div class="workspace-save-as-dialog__actions">
+            <button class="btn btn--subtle" id="workspace-save-as-cancel" type="button" data-i18n="cancel">Cancelar</button>
+            <button class="btn btn--primary" type="submit" data-i18n="save">Guardar</button>
+          </div>
         </form>
       </dialog>
       <dialog class="about-dialog" id="about-dialog" aria-labelledby="about-title">

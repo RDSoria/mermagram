@@ -16,6 +16,14 @@ Mermagram is a desktop editor and viewer for [Mermaid](https://mermaid.js.org/) 
 - Localized interface in Spanish, English, French, Italian, Catalan, German, and Simplified Chinese.
 - On narrow screens, the editor opens as a slide-out drawer.
 
+## Local MCP workspaces
+
+Mermagram provides an **optional, local-only** MCP server over Streamable HTTP. It stays off until enabled with the **MCP** control, is available only while the app is open, and listens on `127.0.0.1` (default port `38641`). Preferences lets you change the port and copy the endpoint, usually `http://127.0.0.1:38641/mcp`. Register that endpoint explicitly in your agent's MCP configuration; discovery is not automatic.
+
+You can enter a fixed port or choose an available one; a selected port is saved and reused on later launches. If that port is occupied at startup, Mermagram reports the error instead of silently changing the endpoint.
+
+An agent must request access, and you must approve the workspace in the app. Each connection is scoped to one workspace; reject unexpected requests and stop the server when you are done. Workspaces and documents live in application data, not as Mermaid files on disk. Use Save/Save As to explicitly create a physical file. Agent updates replace the complete document and are applied only after Mermaid validation/rendering succeeds; protected documents reject future agent writes.
+
 ## General prerequisites
 
 - Node.js 20 or later and npm.
@@ -67,6 +75,8 @@ To build only the frontend:
 ```sh
 npm run build
 ```
+
+Run backend persistence and integration tests with `cargo test --manifest-path src-tauri/Cargo.toml`. CI builds and tests the frontend and backend on macOS, Windows, and Linux.
 
 ## Build and distribution
 
