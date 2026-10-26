@@ -25,6 +25,9 @@ interface FileMenuOptions {
   statusText: HTMLElement;
   fileNameSlot: HTMLElement;
   filePath: HTMLElement;
+  isWorkspaceMode?: () => boolean;
+  onWorkspaceSave?: () => void;
+  onWorkspaceSaveAs?: () => void;
 }
 
 function errorMessage(error: unknown, fallback: string): string {
@@ -297,8 +300,20 @@ export function initFileMenu(options: FileMenuOptions): { saveDocument: (id: str
   };
 
   openButton.addEventListener("click", () => void openFile());
-  saveButton.addEventListener("click", () => void saveFromToolbar(saveCurrent));
-  saveAsButton.addEventListener("click", () => void saveFromToolbar(saveAs));
+  saveButton.addEventListener("click", () => {
+    if (options.isWorkspaceMode?.()) {
+      options.onWorkspaceSave?.();
+      return;
+    }
+    void saveFromToolbar(saveCurrent);
+  });
+  saveAsButton.addEventListener("click", () => {
+    if (options.isWorkspaceMode?.()) {
+      options.onWorkspaceSaveAs?.();
+      return;
+    }
+    void saveFromToolbar(saveAs);
+  });
   recentButton.addEventListener("click", () => {
     if (busy) return;
     renderRecentFiles();

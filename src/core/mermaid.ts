@@ -178,3 +178,18 @@ export async function renderMermaid(code: string): Promise<SVGSVGElement> {
     document.getElementById(id)?.remove();
   }
 }
+
+/** Validates and renders a candidate using the exact Mermaid runtime used by the editor. */
+export async function validateAndRenderCandidate(
+  code: string,
+): Promise<{ valid: true } | { valid: false; issues: MermaidIssue[] }> {
+  const issues = await validateMermaid(code);
+  if (issues.length > 0) return { valid: false, issues };
+
+  try {
+    await renderMermaid(code);
+    return { valid: true };
+  } catch (error) {
+    return { valid: false, issues: [normalizeError(error)] };
+  }
+}
