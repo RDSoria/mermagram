@@ -56,8 +56,9 @@ export interface EditorOptions {
 export interface EditorHandle {
   view: EditorView;
   focus: () => void;
-  replaceDocument: (document: string) => void;
+  replaceDocument: (document: string, focus?: boolean) => void;
   setVisualTheme: (theme: VisualTheme) => void;
+  setReadOnly: (readOnly: boolean) => void;
   undo: () => void;
   redo: () => void;
   canUndo: () => boolean;
@@ -85,6 +86,7 @@ function toDiagnostic(view: EditorView, issue: MermaidIssue): Diagnostic {
 
 export function createEditor(options: EditorOptions): EditorHandle {
   const themeCompartment = new Compartment();
+  const editableCompartment = new Compartment();
   const lintSource = async (view: EditorView): Promise<Diagnostic[]> => {
     const code = view.state.doc.toString();
     if (code.trim().length === 0) {
@@ -104,6 +106,7 @@ export function createEditor(options: EditorOptions): EditorHandle {
     Prec.highest(syntaxHighlighting(porcelainHighlight)),
     mermaid(),
     themeCompartment.of(editorTheme(options.visualTheme)),
+    editableCompartment.of([EditorState.readOnly.of(false), EditorView.editable.of(true)]),
     // The editor is clipped to its well, so CodeMirror's auto-positioned hover
     // tooltip can escape the visible area. Details are available from the
     // syntax-status popup instead; retain the gutter and underlined ranges.
@@ -127,14 +130,22 @@ export function createEditor(options: EditorOptions): EditorHandle {
   return {
     view,
     focus: () => view.focus(),
-    replaceDocument: (document) => {
+    replaceDocument: (document, focus = true) => {
       view.dispatch({
         changes: { from: 0, to: view.state.doc.length, insert: document },
       });
-      view.focus();
+      if (focus) view.focus();
     },
     setVisualTheme: (theme) => {
       view.dispatch({ effects: themeCompartment.reconfigure(editorTheme(theme)) });
+    },
+    setReadOnly: (readOnly) => {
+      view.dispatch({
+        effects: editableCompartment.reconfigure([
+          EditorState.readOnly.of(readOnly),
+          EditorView.editable.of(!readOnly),
+        ]),
+      });
     },
     undo: () => { void undo(view); },
     redo: () => { void redo(view); },

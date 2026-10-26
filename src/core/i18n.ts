@@ -102,6 +102,64 @@ const es = {
   imageReadError: "No se pudo leer la imagen.",
   desktopRecentOnly: "Los archivos recientes solo están disponibles en la app de escritorio.",
   desktopSaveOnly: "Guardar sobre el archivo solo está disponible en la app de escritorio.",
+  mcpLabel: "MCP local",
+  mcpTitle: "Servidor MCP local",
+  mcpRunning: "En ejecución · disponible solo mientras Mermagram está abierta.",
+  mcpStopped: "Detenido · disponible solo mientras Mermagram esté abierta.",
+  mcpPort: "Puerto",
+  mcpApplyPort: "Aplicar",
+  mcpAutoPort: "Elegir disponible",
+  mcpEndpoint: "Endpoint para el agente",
+  mcpCopy: "Copiar",
+  mcpSetupHint: "Registra este endpoint en la configuración MCP de tu agente. No hay descubrimiento automático.",
+  mcpStart: "Activar servidor MCP",
+  mcpStop: "Detener servidor MCP",
+  mcpStatusRunning: "En ejecución",
+  mcpStatusStopped: "Detenido",
+  mcpNoClients: "No hay agentes conectados.",
+  mcpClientConnected: "Agente conectado al workspace: {workspace}",
+  mcpScope: "Permisos",
+  mcpReadWriteScope: "Lectura y escritura de documentos en este workspace",
+  mcpPendingApprovals: "Solicitudes pendientes: {count}",
+  mcpServerError: "Error del servidor MCP: {error}",
+  mcpApprovalTitle: "Solicitud de acceso MCP",
+  mcpApprovalCopy: "Este agente solicita acceso al workspace. Aprobar vincula esta conexión únicamente a este espacio.",
+  mcpApprovalCreateCopy: "El agente solicita crear este workspace y conectarse a él.",
+  mcpAgent: "Agente",
+  mcpWorkspace: "Workspace",
+  mcpDescription: "Descripción",
+  mcpReject: "Rechazar",
+  mcpApprove: "Aprobar acceso",
+  mcpCopySuccess: "Endpoint MCP copiado.",
+  mcpPortSaved: "Puerto MCP actualizado.",
+  mcpApprovalFailed: "No se pudo responder a la solicitud MCP.",
+  workspacePickerTitle: "Workspaces",
+  workspaceDocumentsTitle: "Documentos del workspace",
+  workspaceBack: "Volver a los archivos abiertos",
+  workspaceOpen: "Abrir",
+  workspaceOpenDocument: "Abrir documento",
+  workspaceFocusDocument: "Ir a pestaña",
+  workspaceClose: "Ocultar",
+  workspaceCloseDocument: "Cerrar documento",
+  workspaceDelete: "Eliminar",
+  workspaceDeleteDocument: "Eliminar documento",
+  workspaceEmpty: "Todavía no hay workspaces.",
+  workspaceDeleteConfirm: "¿Eliminar este workspace y todos sus diagramas? Esta acción no se puede deshacer.",
+  workspaceDeleteDocumentConfirm: "¿Eliminar “{name}” del workspace? Esta acción no se puede deshacer.",
+  workspaceDocumentCount: "{count} documentos",
+  workspaceNoDocuments: "Este workspace todavía no tiene documentos.",
+  workspaceStored: "Guardado en Mermagram",
+  workspaceProtect: "Proteger documento frente a agentes",
+  workspaceUnprotect: "Permitir edición por agentes",
+  workspaceProtectedState: "Protegido",
+  workspaceProtectShort: "Proteger",
+  workspaceAgentWriting: "El agente está aplicando cambios…",
+  workspaceSaveAsPrompt: "Nombre del nuevo documento del workspace:",
+  workspaceSaveAsTitle: "Guardar como",
+  workspaceDocumentName: "Nombre del documento",
+  workspaceLabel: "workspace",
+  workspaceSaved: "Documento del workspace guardado.",
+  workspaceSavedAs: "Copia creada en el workspace.",
 } as const;
 
 type TranslationKey = keyof typeof es;
@@ -134,6 +192,12 @@ Object.assign(translations.en, {
   themeNeumorphicLight: "Light neumorphism", themeNeumorphicDark: "Dark neumorphism", themeGlassLight: "Light glassmorphism", themeGlassDark: "Dark glassmorphism", themeRetro: "Retro", themeDialUp: "Dial-up · BBS", layoutClassic: "Classic", layoutBento: "Bento Grid",
   syntaxErrorsTitle: "Syntax error details", closeSyntaxErrors: "Close error details", closeTab: "Close tab", syntaxErrorAtLine: "Line {line}:",
   editDocumentName: "Edit document name: {name}", editDocumentNameTitle: "Click to rename this unsaved document", lastEdited: "Last edited · {date}",
+  workspaceSaveAsPrompt: "Name for the new workspace document:",
+  workspaceSaveAsTitle: "Save as",
+  workspaceDocumentName: "Document name",
+  workspaceLabel: "workspace",
+  workspaceSaved: "Workspace document saved.",
+  workspaceSavedAs: "Copy created in the workspace.",
 });
 Object.assign(translations.fr, {
   appearance: "Apparence", appearanceDescription: "Choisissez le style visuel de l’application.", layoutPreference: "Disposition", layoutDescription: "Choisissez l’organisation de l’éditeur et de l’aperçu.",
@@ -190,6 +254,90 @@ translations.it.desktopSaveOnly = "Il salvataggio sul file corrente è disponibi
 translations.ca.desktopSaveOnly = "Desar sobre el fitxer actual només està disponible a l’aplicació d’escriptori.";
 translations.de.desktopSaveOnly = "Das Überschreiben der aktuellen Datei ist nur in der Desktop-App verfügbar.";
 translations["zh-CN"].desktopSaveOnly = "仅桌面应用支持覆盖保存当前文件。";
+Object.assign(translations.en, {
+  mcpLabel: "Local MCP", mcpTitle: "Local MCP server", mcpRunning: "Running · available only while Mermagram is open.",
+  mcpStopped: "Stopped · available only while Mermagram is open.", mcpPort: "Port", mcpApplyPort: "Apply", mcpAutoPort: "Choose available",
+  mcpEndpoint: "Agent endpoint", mcpCopy: "Copy", mcpSetupHint: "Register this endpoint in your agent's MCP configuration. Discovery is not automatic.",
+  mcpStart: "Start MCP server", mcpStop: "Stop MCP server", mcpApprovalTitle: "MCP access request",
+  mcpStatusRunning: "Running", mcpStatusStopped: "Stopped",
+  mcpNoClients: "No agents connected.", mcpClientConnected: "Agent connected to workspace: {workspace}",
+  mcpScope: "Access", mcpReadWriteScope: "Read and write documents in this workspace",
+  mcpPendingApprovals: "Pending approval requests: {count}", mcpServerError: "MCP server error: {error}",
+  mcpApprovalCopy: "This agent requests access to the workspace. Approval binds this connection to this workspace only.",
+  mcpApprovalCreateCopy: "The agent requests to create this workspace and connect to it.",
+  mcpAgent: "Agent", mcpWorkspace: "Workspace", mcpDescription: "Description", mcpReject: "Reject",
+  mcpApprove: "Approve access", mcpCopySuccess: "MCP endpoint copied.", mcpPortSaved: "MCP port updated.",
+  mcpApprovalFailed: "Could not respond to the MCP request.",
+  workspacePickerTitle: "Workspaces",
+  workspaceBack: "Back to open documents",
+  workspaceOpen: "Open",
+  workspaceClose: "Hide",
+  workspaceDelete: "Delete",
+  workspaceEmpty: "There are no workspaces yet.",
+  workspaceDeleteConfirm: "Delete this workspace and all its diagrams? This cannot be undone.",
+  workspaceStored: "Saved in Mermagram",
+  workspaceProtect: "Protect document from agents",
+  workspaceUnprotect: "Allow agent editing",
+  workspaceAgentWriting: "Agent is applying changes…",
+  workspaceDocumentsTitle: "Workspace documents",
+  workspaceOpenDocument: "Open document",
+  workspaceFocusDocument: "Go to tab",
+  workspaceCloseDocument: "Close document",
+  workspaceDeleteDocument: "Delete document",
+  workspaceDeleteDocumentConfirm: "Delete “{name}” from this workspace? This cannot be undone.",
+  workspaceDocumentCount: "{count} documents",
+  workspaceNoDocuments: "This workspace has no documents yet.",
+  workspaceProtectedState: "Protected",
+  workspaceProtectShort: "Protect",
+});
+const mcpTranslations: Record<Exclude<Language, "es" | "en">, Record<string, string>> = {
+  fr: {
+    mcpLabel: "MCP local", mcpTitle: "Serveur MCP local", mcpRunning: "En cours · disponible uniquement lorsque Mermagram est ouvert.", mcpStopped: "Arrêté · disponible uniquement lorsque Mermagram est ouvert.",
+    mcpPort: "Port", mcpApplyPort: "Appliquer", mcpEndpoint: "Point de terminaison de l’agent", mcpCopy: "Copier", mcpSetupHint: "Enregistrez ce point de terminaison dans la configuration MCP de votre agent. Aucune découverte automatique.", mcpStart: "Démarrer le serveur MCP", mcpStop: "Arrêter le serveur MCP", mcpStatusRunning: "En cours", mcpStatusStopped: "Arrêté", mcpNoClients: "Aucun agent connecté.", mcpClientConnected: "Agent connecté à l’espace : {workspace}", mcpScope: "Accès", mcpReadWriteScope: "Lire et modifier les documents de cet espace", mcpApprovalTitle: "Demande d’accès MCP", mcpApprovalCopy: "Cet agent demande l’accès à cet espace. L’approbation limite cette connexion à cet espace.", mcpApprovalCreateCopy: "L’agent demande à créer cet espace et à s’y connecter.", mcpAgent: "Agent", mcpWorkspace: "Espace", mcpDescription: "Description", mcpReject: "Refuser", mcpApprove: "Autoriser l’accès", mcpCopySuccess: "Point de terminaison MCP copié.", mcpPortSaved: "Port MCP mis à jour.", mcpApprovalFailed: "Impossible de répondre à la demande MCP.", mcpPendingApprovals: "Demandes en attente : {count}", mcpServerError: "Erreur du serveur MCP : {error}",
+  },
+  it: {
+    mcpLabel: "MCP locale", mcpTitle: "Server MCP locale", mcpRunning: "Attivo · disponibile solo quando Mermagram è aperto.", mcpStopped: "Fermo · disponibile solo quando Mermagram è aperto.", mcpPort: "Porta", mcpApplyPort: "Applica", mcpEndpoint: "Endpoint agente", mcpCopy: "Copia", mcpSetupHint: "Registra questo endpoint nella configurazione MCP dell’agente. Non è previsto il rilevamento automatico.", mcpStart: "Avvia server MCP", mcpStop: "Ferma server MCP", mcpStatusRunning: "Attivo", mcpStatusStopped: "Fermo", mcpNoClients: "Nessun agente connesso.", mcpClientConnected: "Agente connesso allo workspace: {workspace}", mcpScope: "Accesso", mcpReadWriteScope: "Leggere e modificare i documenti di questo workspace", mcpApprovalTitle: "Richiesta di accesso MCP", mcpApprovalCopy: "L’agente richiede l’accesso a questo workspace. L’approvazione limita la connessione a questo spazio.", mcpApprovalCreateCopy: "L’agente richiede di creare questo workspace e connettersi.", mcpAgent: "Agente", mcpWorkspace: "Workspace", mcpDescription: "Descrizione", mcpReject: "Rifiuta", mcpApprove: "Approva accesso", mcpCopySuccess: "Endpoint MCP copiato.", mcpPortSaved: "Porta MCP aggiornata.", mcpApprovalFailed: "Impossibile rispondere alla richiesta MCP.", mcpPendingApprovals: "Richieste in attesa: {count}", mcpServerError: "Errore server MCP: {error}",
+  },
+  ca: {
+    mcpLabel: "MCP local", mcpTitle: "Servidor MCP local", mcpRunning: "En execució · disponible només mentre Mermagram és oberta.", mcpStopped: "Aturat · disponible només mentre Mermagram és oberta.", mcpPort: "Port", mcpApplyPort: "Aplica", mcpEndpoint: "Endpoint de l’agent", mcpCopy: "Copia", mcpSetupHint: "Registra aquest endpoint a la configuració MCP de l’agent. No hi ha descobriment automàtic.", mcpStart: "Inicia el servidor MCP", mcpStop: "Atura el servidor MCP", mcpStatusRunning: "En execució", mcpStatusStopped: "Aturat", mcpNoClients: "No hi ha agents connectats.", mcpClientConnected: "Agent connectat a l’espai: {workspace}", mcpScope: "Permisos", mcpReadWriteScope: "Llegir i escriure documents d’aquest espai", mcpApprovalTitle: "Sol·licitud d’accés MCP", mcpApprovalCopy: "L’agent demana accés a aquest espai. L’aprovació limita la connexió a aquest espai.", mcpApprovalCreateCopy: "L’agent demana crear aquest espai i connectar-s’hi.", mcpAgent: "Agent", mcpWorkspace: "Espai", mcpDescription: "Descripció", mcpReject: "Rebutja", mcpApprove: "Aprova l’accés", mcpCopySuccess: "Endpoint MCP copiat.", mcpPortSaved: "Port MCP actualitzat.", mcpApprovalFailed: "No s’ha pogut respondre a la sol·licitud MCP.", mcpPendingApprovals: "Sol·licituds pendents: {count}", mcpServerError: "Error del servidor MCP: {error}",
+  },
+  de: {
+    mcpLabel: "Lokales MCP", mcpTitle: "Lokaler MCP-Server", mcpRunning: "Aktiv · nur verfügbar, solange Mermagram geöffnet ist.", mcpStopped: "Gestoppt · nur verfügbar, solange Mermagram geöffnet ist.", mcpPort: "Port", mcpApplyPort: "Übernehmen", mcpEndpoint: "Agent-Endpunkt", mcpCopy: "Kopieren", mcpSetupHint: "Diesen Endpunkt in der MCP-Konfiguration des Agents registrieren. Keine automatische Erkennung.", mcpStart: "MCP-Server starten", mcpStop: "MCP-Server stoppen", mcpStatusRunning: "Aktiv", mcpStatusStopped: "Gestoppt", mcpNoClients: "Keine Agents verbunden.", mcpClientConnected: "Agent mit Workspace verbunden: {workspace}", mcpScope: "Zugriff", mcpReadWriteScope: "Dokumente in diesem Workspace lesen und bearbeiten", mcpApprovalTitle: "MCP-Zugriffsanfrage", mcpApprovalCopy: "Dieser Agent fordert Zugriff auf den Workspace an. Die Freigabe beschränkt diese Verbindung auf diesen Workspace.", mcpApprovalCreateCopy: "Der Agent möchte diesen Workspace erstellen und verbinden.", mcpAgent: "Agent", mcpWorkspace: "Workspace", mcpDescription: "Beschreibung", mcpReject: "Ablehnen", mcpApprove: "Zugriff erlauben", mcpCopySuccess: "MCP-Endpunkt kopiert.", mcpPortSaved: "MCP-Port aktualisiert.", mcpApprovalFailed: "MCP-Anfrage konnte nicht beantwortet werden.", mcpPendingApprovals: "Ausstehende Anfragen: {count}", mcpServerError: "MCP-Serverfehler: {error}",
+  },
+  "zh-CN": {
+    mcpLabel: "本地 MCP", mcpTitle: "本地 MCP 服务器", mcpRunning: "运行中 · 仅在 Mermagram 打开时可用。", mcpStopped: "已停止 · 仅在 Mermagram 打开时可用。", mcpPort: "端口", mcpApplyPort: "应用", mcpEndpoint: "代理端点", mcpCopy: "复制", mcpSetupHint: "请在代理的 MCP 配置中注册此端点。不提供自动发现。", mcpStart: "启动 MCP 服务器", mcpStop: "停止 MCP 服务器", mcpStatusRunning: "运行中", mcpStatusStopped: "已停止", mcpNoClients: "没有已连接的代理。", mcpClientConnected: "代理已连接到工作区：{workspace}", mcpScope: "权限", mcpReadWriteScope: "读取和写入此工作区中的文档", mcpApprovalTitle: "MCP 访问请求", mcpApprovalCopy: "此代理请求访问工作区。批准后此连接仅限于该工作区。", mcpApprovalCreateCopy: "代理请求创建此工作区并连接。", mcpAgent: "代理", mcpWorkspace: "工作区", mcpDescription: "描述", mcpReject: "拒绝", mcpApprove: "批准访问", mcpCopySuccess: "已复制 MCP 端点。", mcpPortSaved: "MCP 端口已更新。", mcpApprovalFailed: "无法响应 MCP 请求。", mcpPendingApprovals: "待审批请求：{count}", mcpServerError: "MCP 服务器错误：{error}",
+  },
+};
+for (const [language, values] of Object.entries(mcpTranslations)) {
+  Object.assign(translations[language as keyof typeof mcpTranslations], values);
+}
+const autoPortLabels: Record<Exclude<Language, "es" | "en">, string> = {
+  fr: "Choisir un port libre", it: "Scegli porta libera", ca: "Tria un port lliure",
+  de: "Freien Port wählen", "zh-CN": "选择可用端口",
+};
+for (const [language, label] of Object.entries(autoPortLabels)) {
+  Object.assign(translations[language as keyof typeof autoPortLabels], { mcpAutoPort: label });
+}
+const workspaceTranslations: Record<Exclude<Language, "es" | "en">, Record<string, string>> = {
+  fr: {
+    workspaceDocumentsTitle: "Documents de l’espace", workspaceOpenDocument: "Ouvrir un document", workspaceFocusDocument: "Afficher l’onglet", workspaceCloseDocument: "Fermer le document", workspaceDeleteDocument: "Supprimer le document", workspaceDeleteDocumentConfirm: "Supprimer « {name} » de cet espace ? Cette action est irréversible.", workspaceDocumentCount: "{count} documents", workspaceNoDocuments: "Cet espace ne contient pas encore de documents.", workspaceProtectedState: "Protégé", workspaceProtectShort: "Protéger",
+  },
+  it: {
+    workspaceDocumentsTitle: "Documenti dello workspace", workspaceOpenDocument: "Apri documento", workspaceFocusDocument: "Vai alla scheda", workspaceCloseDocument: "Chiudi documento", workspaceDeleteDocument: "Elimina documento", workspaceDeleteDocumentConfirm: "Eliminare “{name}” da questo workspace? L’azione non si può annullare.", workspaceDocumentCount: "{count} documenti", workspaceNoDocuments: "Questo workspace non contiene ancora documenti.", workspaceProtectedState: "Protetto", workspaceProtectShort: "Proteggi",
+  },
+  ca: {
+    workspaceDocumentsTitle: "Documents de l’espai", workspaceOpenDocument: "Obre un document", workspaceFocusDocument: "Ves a la pestanya", workspaceCloseDocument: "Tanca el document", workspaceDeleteDocument: "Elimina el document", workspaceDeleteDocumentConfirm: "Vols eliminar “{name}” d’aquest espai? Aquesta acció no es pot desfer.", workspaceDocumentCount: "{count} documents", workspaceNoDocuments: "Aquest espai encara no té documents.", workspaceProtectedState: "Protegit", workspaceProtectShort: "Protegeix",
+  },
+  de: {
+    workspaceDocumentsTitle: "Workspace-Dokumente", workspaceOpenDocument: "Dokument öffnen", workspaceFocusDocument: "Zum Tab wechseln", workspaceCloseDocument: "Dokument schließen", workspaceDeleteDocument: "Dokument löschen", workspaceDeleteDocumentConfirm: "„{name}“ aus diesem Workspace löschen? Dies kann nicht rückgängig gemacht werden.", workspaceDocumentCount: "{count} Dokumente", workspaceNoDocuments: "Dieser Workspace enthält noch keine Dokumente.", workspaceProtectedState: "Geschützt", workspaceProtectShort: "Schützen",
+  },
+  "zh-CN": {
+    workspaceDocumentsTitle: "工作区文档", workspaceOpenDocument: "打开文档", workspaceFocusDocument: "切换到标签", workspaceCloseDocument: "关闭文档", workspaceDeleteDocument: "删除文档", workspaceDeleteDocumentConfirm: "从此工作区删除“{name}”？此操作无法撤销。", workspaceDocumentCount: "{count} 个文档", workspaceNoDocuments: "此工作区还没有文档。", workspaceProtectedState: "已保护", workspaceProtectShort: "保护",
+  },
+};
+for (const [language, values] of Object.entries(workspaceTranslations)) {
+  Object.assign(translations[language as keyof typeof workspaceTranslations], values);
+}
 
 const STORAGE_KEY = "mermagram:language";
 let currentLanguage: Language = "es";

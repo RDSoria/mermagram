@@ -16,6 +16,14 @@ Mermagram es un editor y visor de diagramas [Mermaid](https://mermaid.js.org/) p
 - Interfaz localizada en español, inglés, francés, italiano, catalán, alemán y chino simplificado.
 - En pantallas angostas, el editor se abre como panel deslizante.
 
+## Workspaces MCP locales
+
+Mermagram ofrece un servidor MCP **local y opcional** usando Streamable HTTP. Permanece apagado hasta que lo actives desde el botón **MCP**; solo está disponible mientras la aplicación está abierta y escucha en `127.0.0.1` (puerto predeterminado `38641`). En Preferencias puedes cambiar el puerto y copiar el endpoint, normalmente `http://127.0.0.1:38641/mcp`. Registra ese endpoint explícitamente en la configuración MCP de tu agente; no hay descubrimiento automático.
+
+Puedes introducir un puerto fijo o elegir uno disponible; el puerto elegido se guarda y se reutiliza en los siguientes inicios. Si ese puerto está ocupado al arrancar, Mermagram muestra el error en vez de cambiar el endpoint por su cuenta.
+
+Un agente debe solicitar acceso y tú debes aprobar el workspace en la aplicación. Cada conexión queda limitada a un workspace; rechaza solicitudes inesperadas y detén el servidor cuando no lo uses. Los workspaces y documentos se guardan como datos de aplicación, no como archivos Mermaid en el disco. Usa Guardar/Guardar como para crear un archivo físico de forma explícita. Los cambios de un agente sustituyen el documento completo y solo se aplican después de validar/renderizar Mermaid; los documentos protegidos rechazan futuras escrituras de agentes.
+
 ## Requisitos generales
 
 - Node.js 20 o posterior y npm.
@@ -67,6 +75,8 @@ Para compilar únicamente el frontend:
 ```sh
 npm run build
 ```
+
+Las pruebas de integración y persistencia del backend se ejecutan con `cargo test --manifest-path src-tauri/Cargo.toml`. CI compila y prueba el frontend y backend en macOS, Windows y Linux.
 
 ## Compilar y distribuir
 

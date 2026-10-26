@@ -78,7 +78,7 @@
     display: none;
   }
 
-  .file-toolbar { --file-chrome-rail-width: 168px; --file-chrome-gap: 10px; flex-wrap: wrap; gap: 6px; }
+  .file-toolbar { --file-chrome-rail-width: 184px; --file-chrome-gap: 10px; flex-wrap: wrap; gap: 6px; }
   .file-rail { gap: 4px; padding-inline: 7px; }
   .file-rail .file-rail__brand { width: 42px; height: 42px; }
   .file-rail__button { width: 32px; height: 32px; }
@@ -113,9 +113,12 @@
   }
   .file-toolbar__document { display: flex; order: 3; flex: 1 1 100%; min-width: 0; }
   .file-toolbar { --file-chrome-rail-width: 88px; --file-chrome-gap: 8px; --file-tabs-overhang: 40px; margin-top: 34px; }
-  .file-rail { display: grid; grid-template-columns: 32px 28px; grid-template-rows: 32px 28px; justify-content: center; align-content: center; gap: 2px; padding: 3px; }
+  .file-toolbar.file-toolbar--workspace { margin-top: 44px; }
+  .file-rail { display: grid; grid-template-columns: 32px 28px; grid-template-rows: 32px 28px 28px; justify-content: center; align-content: center; gap: 2px; padding: 3px; }
   .file-rail .file-rail__brand { width: 32px; height: 32px; }
   .file-rail__button { width: 28px; height: 28px; }
+  .mcp-indicator { min-width: 28px; width: 28px; height: 28px; padding: 0; gap: 0; font-size: 0; }
+  .mcp-indicator__dot { width: 8px; height: 8px; }
   #zoom-readout { display: none; }
   .file-toolbar__actions { flex: 1 1 100%; width: 100%; flex-wrap: wrap; justify-content: flex-end; }
   .file-toolbar__actions .toolbar__group--center { flex: 0 1 auto; flex-wrap: wrap; }
